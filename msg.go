@@ -9,13 +9,20 @@ import (
 
 func messageHandler(msg *openwechat.Message) {
 	if msg.IsText() {
-		procText(msg)
-	} else if msg.IsFriendAdd() {
+		if msg.IsSendByGroup() {
+			procGroupText(msg)
+		} else {
+			procText(msg)
+		}
+		return
+	}
+
+	if msg.IsFriendAdd() {
 		msg.Agree()
 		log.Printf("auto agree to user %s", msg.FromUserName)
-	} else {
-		log.Printf("unprocessed messages: %+v", msg)
+		return
 	}
+	log.Printf("unprocessed messages: %+v", msg)
 }
 
 func procText(msg *openwechat.Message) {
@@ -26,6 +33,9 @@ func procText(msg *openwechat.Message) {
 	} else {
 		msg.ReplyText("不识别的命令")
 	}
+}
+
+func procGroupText(msg *openwechat.Message) {
 }
 
 func autoIntoGroup(msg *openwechat.Message) {
